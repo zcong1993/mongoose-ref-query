@@ -5,6 +5,7 @@ export interface Options {
     model: Model<any>
     refKey: string
     destKey?: string
+    extQuery?: any
   }
 }
 
@@ -20,8 +21,10 @@ export const refQuery = async <T = any[]>(
   for (const key in options) {
     refsMap[key] = {}
     const ids = originDoc.map(d => d[key])
+    const extQuery = options[key].extQuery || {}
     const refDoc = await options[key].model.find({
-      [options[key].refKey]: { $in: ids }
+      [options[key].refKey]: { $in: ids },
+      ...extQuery
     })
     refDoc.forEach(d => {
       refsMap[key][d[options[key].refKey]] = d

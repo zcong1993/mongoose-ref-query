@@ -19,7 +19,11 @@ const Test2Schema = new mongoose.Schema({
 
 const Test3Schema = new mongoose.Schema({
   name: String,
-  tid: String
+  tid: String,
+  is_deleted: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const Test1 = mongoose.model('Test1', Test1Schema)
@@ -86,7 +90,8 @@ it('should work well', async () => {
     test3Tid: {
       model: Test3,
       refKey: 'tid',
-      destKey: 'test3'
+      destKey: 'test3',
+      extQuery: { is_deleted: false }
     }
   })
 
