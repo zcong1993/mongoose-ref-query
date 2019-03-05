@@ -26,14 +26,21 @@ const Test3Schema = new mongoose.Schema({
   }
 })
 
+const Test4Schema = new mongoose.Schema({
+  name: String,
+  test1Name: String
+})
+
 const Test1 = mongoose.model('Test1', Test1Schema)
 const Test2 = mongoose.model('Test2', Test2Schema)
 const Test3 = mongoose.model('Test3', Test3Schema)
+const Test4 = mongoose.model('Test4', Test4Schema)
 
 const dropAll = async () => {
   await Test1.collection.drop()
   await Test2.collection.drop()
   await Test3.collection.drop()
+  await Test4.collection.drop()
 }
 
 beforeAll(async () => {
@@ -71,9 +78,21 @@ beforeAll(async () => {
     }
   ]
 
+  const test4 = [
+    {
+      name: 'test41',
+      test1Name: 'test11'
+    },
+    {
+      name: 'test42',
+      test1Name: 'test11'
+    }
+  ]
+
   await Test1.insertMany(test1)
   await Test2.insertMany(test2)
   await Test3.insertMany(test3)
+  await Test4.insertMany(test4)
 })
 
 afterAll(async () => {
@@ -82,18 +101,27 @@ afterAll(async () => {
 })
 
 it('should work well', async () => {
-  const res = await refQuery(Test1, {
-    test2Id: {
+  const res = await refQuery(Test1, [
+    {
+      key: 'test2Id',
       model: Test2,
       refKey: 'id'
     },
-    test3Tid: {
+    {
+      key: 'test3Tid',
       model: Test3,
       refKey: 'tid',
       destKey: 'test3',
       extQuery: { is_deleted: false }
+    },
+    {
+      key: 'name',
+      model: Test4,
+      refKey: 'test1Name',
+      destKey: 'test4',
+      isOne2Many: true
     }
-  })
+  ])
 
   expect(res.length).toBe(2)
   res.forEach(r => {
@@ -103,6 +131,11 @@ it('should work well', async () => {
   res.forEach(r => {
     expect(r.test3Tid).toBe(r.test3.tid)
   })
+
+  const one2manyRes = res.filter(r => r.name === 'test11')
+  one2manyRes[0].test4.forEach((res: any) =>
+    expect(res.test1Name).toBe('test11')
+  )
 })
 
 it('origin should works well', async () => {
