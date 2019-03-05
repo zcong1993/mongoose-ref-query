@@ -1,6 +1,6 @@
 {
   "name": "@zcong/mongoose-ref-query",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "my cool project",
   "main": "./dist/index.js",
   "files": [
