@@ -103,11 +103,13 @@ afterAll(async () => {
 it('should work well', async () => {
   const res = await refQuery(Test1, [
     {
+      id: 'test2-ref',
       key: 'test2Id',
       model: Test2,
       refKey: 'id'
     },
     {
+      id: 'test3-ref',
       key: 'test3Tid',
       model: Test3,
       refKey: 'tid',
@@ -115,6 +117,7 @@ it('should work well', async () => {
       extQuery: { is_deleted: false }
     },
     {
+      id: 'test4-ref',
       key: 'name',
       model: Test4,
       refKey: 'test1Name',

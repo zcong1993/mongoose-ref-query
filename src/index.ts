@@ -2,6 +2,7 @@ import { Model } from 'mongoose'
 
 export interface Option {
   model: Model<any>
+  id: string
   key: string
   refKey: string
   destKey?: string
@@ -20,7 +21,7 @@ export const refQuery = async <T = any[]>(
   const refsMap: { [key: string]: any } = {}
   for (const option of options) {
     const key = option.key
-    refsMap[key] = {}
+    refsMap[option.id] = {}
     const ids = originDoc.map(d => d[key])
     const extQuery = option.extQuery || {}
     const refDoc = await option.model.find({
@@ -29,11 +30,13 @@ export const refQuery = async <T = any[]>(
     })
     refDoc.forEach(d => {
       if (option.isOne2Many) {
-        refsMap[key][d[option.refKey]] = !refsMap[key][d[option.refKey]]
+        refsMap[option.id][d[option.refKey]] = !refsMap[option.id][
+          d[option.refKey]
+        ]
           ? [d]
-          : [...refsMap[key][d[option.refKey]], d]
+          : [...refsMap[option.id][d[option.refKey]], d]
       } else {
-        refsMap[key][d[option.refKey]] = d
+        refsMap[option.id][d[option.refKey]] = d
       }
     })
   }
@@ -44,7 +47,7 @@ export const refQuery = async <T = any[]>(
     for (const option of options) {
       const key = option.key
       const kk = option.destKey ? option.destKey : `_${key}`
-      dd[kk] = refsMap[key][dd[key]]
+      dd[kk] = refsMap[option.id][dd[key]]
     }
     res.push(dd)
   })
