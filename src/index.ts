@@ -8,6 +8,8 @@ export interface Option {
   destKey?: string
   extQuery?: any
   isOne2Many?: boolean
+  fields?: any
+  queryOptions?: any
 }
 
 export const refQuery = async <T = any[]>(
@@ -24,10 +26,14 @@ export const refQuery = async <T = any[]>(
     refsMap[option.id] = {}
     const ids = originDoc.map(d => d[key])
     const extQuery = option.extQuery || {}
-    const refDoc = await option.model.find({
-      [option.refKey]: { $in: ids },
-      ...extQuery
-    })
+    const refDoc = await option.model.find(
+      {
+        [option.refKey]: { $in: ids },
+        ...extQuery
+      },
+      option.fields,
+      option.queryOptions
+    )
     refDoc.forEach(d => {
       if (option.isOne2Many) {
         refsMap[option.id][d[option.refKey]] = !refsMap[option.id][
